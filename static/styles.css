@@ -123,3 +123,18 @@ img {
   margin: 10px 0;
   display: inline-block;
 }
+
+.hidden-link {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  background-color: #050016;
+  color: #050016;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.hidden-link:hover {
+  background-color: #6431e6;
+  color: #fff;
+}
