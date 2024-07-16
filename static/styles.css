@@ -29,7 +29,7 @@ body {
 
 .wavy {
   animation-name: wavy;
-  animation-duration: 1.3s;
+  animation-duration: 5s;
   animation-timing-function: ease;
   animation-iteration-count: infinite;
   position: relative;
@@ -38,12 +38,12 @@ body {
 }
 @keyframes wavy {
   0% {
-    top: 0px;
+    top: 5px;
   }
   50% {
     top: -15px;
   }
   100% {
-    top: 0px;
+    top: 5px;
   }
 }

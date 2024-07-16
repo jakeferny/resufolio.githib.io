@@ -15,7 +15,7 @@ let delay = 200;
       Array.from(h1.children).forEach((span, index) => {
         setTimeout(() => {
           span.classList.add("wavy");
-        }, index * 60 + delay);
+        }, index * 200 + delay);
       });
 
 }
