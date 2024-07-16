@@ -7,3 +7,43 @@ body {
     text-align: left;
 
 }
+
+#titleDiv h1 {
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+
+#titleDiv h2 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+#titleDiv h3 {
+  margin-top: 0;
+  margin-bottom: 0px; 
+  width: 60%;    
+  margin: 0 auto;    
+  text-align: center; 
+}
+
+
+.wavy {
+  animation-name: wavy;
+  animation-duration: 1.3s;
+  animation-timing-function: ease;
+  animation-iteration-count: infinite;
+  position: relative;
+  top: 0;
+  left: 0;
+}
+@keyframes wavy {
+  0% {
+    top: 0px;
+  }
+  50% {
+    top: -15px;
+  }
+  100% {
+    top: 0px;
+  }
+}
