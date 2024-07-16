@@ -1,5 +1,10 @@
 /* Styles */
 
+.navbar.sticky-top {
+  background-color: white; /* Ensures the navbar has a background */
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1); /* Adds a slight shadow for better visibility over content */
+}
+
 body {
     background-color: #050016;
     color: rgb(255, 255, 255);
