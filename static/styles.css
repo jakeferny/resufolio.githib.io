@@ -4,10 +4,25 @@ body {
     background-color: #050016;
     color: rgb(255, 255, 255);
     font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
-    text-align: left;
+    text-align: justify;
     margin: 10;
     padding-bottom: 50px; /* Height of the footer */
+}
+/* Margin for desktop */
+@media (min-width: 768px) {
+  body {
+    margin-left: 100px;
+    margin-right: 100px;
+    margin-top: 25px;
+  }
+}
 
+/* Margin for mobile */
+@media (max-width: 767px) {
+  body {
+      bottom: 5px;
+      left: 5px;
+  }
 }
 
 #titleDiv h1 {
@@ -77,7 +92,7 @@ body {
   position: absolute;
   background-color: #f1f1f1;
   min-width: 60px;
-  max-width: 100px;
+  max-width: 160px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
 }
@@ -138,3 +153,4 @@ img {
   background-color: #6431e6;
   color: #fff;
 }
+
