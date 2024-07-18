@@ -17,6 +17,7 @@ body {
   }
 }
 
+
 /* Margin for mobile */
 @media (max-width: 767px) {
   body {
@@ -184,5 +185,21 @@ footer {
   font-size: 2em;
   font-weight: bold; 
   text-decoration: underline; 
-  
+}
+
+/* Jazz Button */
+.jazzy {
+  background-color: #6431e6;
+  color: white;
+  padding: 1px;
+  font-size: 12px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  z-index: 1000;
 }

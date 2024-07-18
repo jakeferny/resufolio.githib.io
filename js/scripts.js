@@ -21,3 +21,19 @@ let delay = 200;
 }
 
 updateText("jakefernhout.com");
+
+
+const audio = document.getElementById('jazz');
+const playPauseButton = document.getElementById('playPause');
+
+audio.pause();
+
+playPauseButton.addEventListener('click', function() {
+    if (audio.paused) {
+        audio.play();
+        playPauseButton.textContent = 'No Jazz';
+    } else {
+        audio.pause();
+        playPauseButton.textContent = 'Jazz';
+    }
+});
