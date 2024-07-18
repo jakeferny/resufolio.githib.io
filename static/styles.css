@@ -129,7 +129,6 @@ footer {
   bottom: 0;
   width: 100%;
   text-align: center;
-  padding: 1rem;
 }
 
 
@@ -177,14 +176,6 @@ footer {
 .hidden-link:hover {
   background-color: #6431e6;
   color: #fff;
-}
-
-
-.large-link {
-  color: white;
-  font-size: 2em;
-  font-weight: bold; 
-  text-decoration: underline; 
 }
 
 /* Jazz Button */
