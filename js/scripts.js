@@ -31,9 +31,9 @@ audio.pause();
 playPauseButton.addEventListener('click', function() {
     if (audio.paused) {
         audio.play();
-        playPauseButton.textContent = 'No Jazz';
+        playPauseButton.textContent = 'No Music';
     } else {
         audio.pause();
-        playPauseButton.textContent = 'Jazz';
+        playPauseButton.textContent = 'Music';
     }
 });
