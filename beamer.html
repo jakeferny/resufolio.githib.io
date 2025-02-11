@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FHNTP0588Q"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-FHNTP0588Q');
+    </script>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.0/full/pyodide.js"></script>
+    
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="static/styles.css">
+    <link rel="icon" type="image/x-icon" href="static/gear.ico">
+    <title>jakefernhout.com</title>
+</head>
+<body>
+    <div id="titleDiv">
+        <a id="linx", href="index.html">Home</a>
+        <br>
+        <br>
+        <h1>Support Finder</h1>
+        <h4>August 2024</h4>
+        <h4>Edmonton, Alberta</h4>
+    </div>
+
+    <pre id="output" style="border:1px solid #ccc; padding:1em;"></pre>
+    <img id="plot" style="max-width:100%; border:1px solid #ccc; display:none;" />
+    
+    <div>
+        <label><strong>Beam Length [mm]:</strong></label>
+        <input type="number" id="beamLength" value="2664" style="width:100px">
+        
+        <label style="margin-left:2em;"><strong>Resolution:</strong></label>
+        <input type="number" id="resolution" value="1000" style="width:100px">
+      </div>
+      
+      <hr>
+      
+      <!-- 2) Table for multiple loads -->
+      <h3>Loads</h3>
+      <table id="loadsTable">
+        <thead>
+          <tr>
+            <th>Load Name</th>
+            <th>Force (N)</th>
+            <th>Distance (mm)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Rows will be added dynamically here -->
+        </tbody>
+      </table>
+      <br>
+      <button id="addLoadBtn">Add Load</button>
+      
+      <hr>
+      
+      <!-- 3) Run button -->
+      <button id="runBtn" style="margin-top:1em;">Run Python Code</button>
+      
+      
+      <script>
+      let pyodide = null;
+      let pyodideReady = false;
+      
+      // ============================
+      // A) Load Pyodide & packages
+      // ============================
+      async function loadPyodideAndPackages() {
+        document.getElementById("output").textContent = "Loading Pyodide...";
+        
+        pyodide = await loadPyodide({
+          indexURL : "https://cdn.jsdelivr.net/pyodide/v0.24.0/full/"
+        });
+      
+        document.getElementById("output").textContent = "Loading numpy & matplotlib...";
+        await pyodide.loadPackage(["numpy", "matplotlib"]);
+      
+        pyodideReady = true;
+        document.getElementById("output").textContent =
+          "Pyodide + packages loaded. Add loads and run the analysis";
+      }
+      loadPyodideAndPackages();
+      
+      // ===========================
+      // B) Add load row to table
+      // ===========================
+      document.getElementById("addLoadBtn").addEventListener("click", () => {
+        const tableBody = document.getElementById("loadsTable").querySelector("tbody");
+      
+        // Create a new row with three cells
+        let row = document.createElement("tr");
+        
+        let nameCell = document.createElement("td");
+        let forceCell = document.createElement("td");
+        let distCell = document.createElement("td");
+        
+        // Inputs
+        let nameInput = document.createElement("input");
+        nameInput.type = "text";
+        nameInput.placeholder = "e.g. L1";
+        
+        let forceInput = document.createElement("input");
+        forceInput.type = "number";
+        forceInput.placeholder = "Force (N)";
+        forceInput.style.width = "100px";
+        
+        let distInput = document.createElement("input");
+        distInput.type = "number";
+        distInput.placeholder = "Distance (mm)";
+        distInput.style.width = "100px";
+      
+        nameCell.appendChild(nameInput);
+        forceCell.appendChild(forceInput);
+        distCell.appendChild(distInput);
+      
+        row.appendChild(nameCell);
+        row.appendChild(forceCell);
+        row.appendChild(distCell);
+        
+        tableBody.appendChild(row);
+      });
+      
+      // =======================
+      // C) Run Python Analysis
+      // =======================
+      document.getElementById("runBtn").addEventListener("click", runPython);
+      
+      async function runPython() {
+        if(!pyodideReady) {
+          document.getElementById("output").textContent =
+            "Pyodide is still loading. Please wait...";
+          return;
+        }
+      
+        // 1) Gather user inputs
+        const beamLen = parseFloat(document.getElementById("beamLength").value);
+        const resol = parseInt(document.getElementById("resolution").value);
+      
+        // 2) Gather loads from table
+        let loadsDict = {}; // e.g. { "Load1": [force, distance], ... }
+        const tableBody = document.getElementById("loadsTable").querySelector("tbody");
+        const rows = tableBody.querySelectorAll("tr");
+      
+        rows.forEach( row => {
+          const cells = row.querySelectorAll("td");
+          if(cells.length === 3) {
+            let loadName = cells[0].querySelector("input").value.trim();
+            let forceVal = parseFloat(cells[1].querySelector("input").value);
+            let distVal  = parseFloat(cells[2].querySelector("input").value);
+      
+            if(loadName && !isNaN(forceVal) && !isNaN(distVal)) {
+              // e.g. loadsDict["L1"] = [500, 200]
+              loadsDict[loadName] = [forceVal, distVal];
+            }
+          }
+        });
+      
+        // If no loads, warn the user
+        if(Object.keys(loadsDict).length === 0) {
+          document.getElementById("output").textContent = 
+            "No valid loads entered, my Liege. Please add loads.";
+          return;
+        }
+      
+        // 3) Build the Python code string
+        // We'll embed loadsDict as JSON
+        const loadsJSON = JSON.stringify(loadsDict);
+      
+        const pythonCode = `
+      import sys, io, base64, json
+      import numpy as np
+      import matplotlib
+      matplotlib.use('Agg')  # Non-interactive backend
+      import matplotlib.pyplot as plt
+      
+      backup_stdout = sys.stdout
+      buffer_stdout = io.StringIO()
+      
+      try:
+          sys.stdout = buffer_stdout
+      
+          # Parse user inputs
+          user_loads = json.loads("""${loadsJSON}""")
+          beam_length = ${beamLen}
+          resolution  = ${resol}
+      
+          # ============ BEGIN Beam Analysis ============
+          reaction_force = 0
+          for values in user_loads.values():
+              reaction_force += values[0]
+      
+          positions = list(np.linspace(0, beam_length, resolution))
+          for load in user_loads.values():
+              if load[1] not in positions:
+                  positions.append(load[1])
+          positions.sort()
+      
+          shear_bm = 1.0e8
+          moment_bm = 1.0e8
+          reaction_moment_bm = 1.0e8
+          fitting_pos = 0
+      
+          for pos in positions:
+              moment_dict = {-1:0}
+              shear_dict = {-1:0}
+              pre_x = -1
+      
+              # Reaction moment at 'pos'
+              reaction_moment = 0
+              for vals in user_loads.values():
+                  if vals[1] < pos:
+                      reaction_moment -= vals[0] * (pos - vals[1]) / 1000
+                  elif vals[1] > pos:
+                      reaction_moment += vals[0] * (vals[1] - pos) / 1000
+      
+              # Compute shear & moment
+              for x in positions:
+                  moment_dict[x] = 0
+                  shear_dict[x] = shear_dict[pre_x]
+                  pre_x = x
+      
+                  if x == pos:
+                      shear_dict[x] += reaction_force
+                      moment_dict[x] += reaction_moment
+                  elif x > pos:
+                      moment_dict[x] = reaction_moment - reaction_force * (x - pos) / 1000
+      
+                  for load_item in user_loads.values():
+                      if x == load_item[1]:
+                          shear_dict[x] -= load_item[0]
+                      elif x > load_item[1]:
+                          moment_dict[x] += load_item[0] * (x - load_item[1]) / 1000
+      
+              moment_dict.pop(-1)
+              shear_dict.pop(-1)
+      
+              reaction_moment_abs = abs(reaction_moment)
+              if reaction_moment_abs < reaction_moment_bm:
+                  opt_moment_dict = moment_dict
+                  opt_shear_dict = shear_dict
+                  reaction_moment_bm = reaction_moment_abs
+                  fitting_pos = pos
+      
+          x_values = sorted(positions)
+          y_val_beam   = [0 for _ in x_values]
+          y_val_shear  = [opt_shear_dict[x] for x in x_values]
+          y_val_moment = [opt_moment_dict[x] for x in x_values]
+      
+          # Final reaction moment
+          final_reaction_moment = 0
+          for vals in user_loads.values():
+              if vals[1] < fitting_pos:
+                  final_reaction_moment -= vals[0]*(fitting_pos - vals[1])/1000
+              elif vals[1] > fitting_pos:
+                  final_reaction_moment += vals[0]*(vals[1] - fitting_pos)/1000
+      
+          fig, axs = plt.subplots(3, 1, figsize=(8,12))
+      
+          axs[0].plot(x_values, y_val_beam, color='black')
+          axs[0].set_title('Optimized for Bending')
+          axs[0].set_ylabel('FBD')
+          axs[0].set_yticks([])
+          axs[0].plot(fitting_pos, 0, 'o', markersize=10, color='black')
+      
+          # Show loads
+          for name, val in user_loads.items():
+              axs[0].arrow(val[1], val[0], 0, -val[0], length_includes_head=True,
+                           head_width=10, head_length=3, fc='red', ec='red')
+              axs[0].annotate(name, xy=(val[1], val[0]))
+      
+          axs[0].text(0.95, 0.95, f'Support = {round(fitting_pos,1)} mm',
+                      fontsize=10, ha='right', va='top', transform=axs[0].transAxes)
+      
+          axs[1].plot(x_values, y_val_shear, color='green')
+          axs[1].set_ylabel('Shear [N]')
+      
+          axs[2].plot(x_values, y_val_moment, color='blue')
+          axs[2].set_ylabel('Moment [N·m]')
+      
+          plt.tight_layout()
+      
+          # Print Reaction Forces
+          print("Reaction forces:")
+          print(f"Shear    = {round(reaction_force,1)} [N]")
+          print(f"Moment   = {round(final_reaction_moment,1)} [N m]")
+          print(f"Location = {round(fitting_pos,1)} [mm]")
+      
+          # ============ END Beam Analysis ============
+      
+          buf = io.BytesIO()
+          plt.savefig(buf, format='png', bbox_inches='tight')
+          buf.seek(0)
+          encoded_fig = base64.b64encode(buf.read()).decode('utf-8')
+      
+          printed_output = buffer_stdout.getvalue()
+      finally:
+          sys.stdout = backup_stdout
+      
+      (encoded_fig, printed_output)
+      `;
+      
+        // 4) Show "Running code..." 
+        document.getElementById("output").textContent = "Running code...";
+        document.getElementById("plot").style.display = "none";
+      
+        // 5) Execute in Pyodide
+        try {
+          let result = await pyodide.runPythonAsync(pythonCode);
+          // 'result' is a Python tuple: [encoded_fig, printed_output]
+          const [base64Plot, consoleText] = result;
+      
+          // Display output
+          document.getElementById("output").textContent = consoleText;
+      
+          // Display the plot
+          const plotImg = document.getElementById("plot");
+          plotImg.src = "data:image/png;base64," + base64Plot;
+          plotImg.style.display = "block";
+      
+        } catch (err) {
+          document.getElementById("output").textContent =
+            "Error:\n" + err;
+        }
+      }
+      </script>
+</body>
+</html>

@@ -175,6 +175,10 @@ footer {
   filter: invert(100%);
 }
 
+#picInvert {
+  filter: invert(100%);
+}
+
 .hidden-link {
   position: fixed;
   bottom: 10px;
