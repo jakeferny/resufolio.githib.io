@@ -219,25 +219,25 @@ footer {
 }
 
 
-a.sticker {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  width: 100px;
-  height: 100px;
-  background: red;
-  color: white;
-  font-weight: bold;
-  font-family: sans-serif;
-  font-size: 12px;
-  border-radius: 50%;
-  z-index: 9999;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 8px;
+.sticker {
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  width: 100px !important;
+  height: 100px !important;
+  background: red !important;
+  color: white !important;
+  font-weight: bold !important;
+  font-family: sans-serif !important;
+  font-size: 12px !important;
+  border-radius: 50% !important;
+  z-index: 9999 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  padding: 8px !important;
 }
 
 .sticker-text {
