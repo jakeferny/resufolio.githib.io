@@ -228,7 +228,7 @@ footer {
   background: red !important;
   color: white !important;
   font-weight: bold !important;
-  font-family: sans-serif !important;
+  font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace !important;
   font-size: 12px !important;
   border-radius: 50% !important;
   z-index: 9999 !important;
