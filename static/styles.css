@@ -217,3 +217,30 @@ footer {
   border-radius: 50%;
   object-fit: cover;
 }
+
+
+.sticker {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 100px;
+  height: 100px;
+  background: red;
+  color: white;
+  font-weight: bold;
+  font-family: sans-serif;
+  font-size: 12px;
+  border-radius: 50%;
+  z-index: 9999;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8px;
+}
+
+.sticker-text {
+  transform: rotate(15deg);
+  line-height: 1.2;
+}
