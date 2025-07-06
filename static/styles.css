@@ -219,7 +219,7 @@ footer {
 }
 
 
-.sticker {
+a.sticker {
   position: fixed;
   top: 20px;
   right: 20px;
